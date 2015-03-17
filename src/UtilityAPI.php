@@ -8,9 +8,11 @@
  */
 namespace UtilityAPI;
 
-use UtilityAPI\Request\UtilityAPIRequestInterface;
+use UtilityAPI\RequestHandler\RequestHandlerInterface;
 
-use UtilityAPI\Request\UtilityAPIRequest;
+use UtilityAPI\Request\RequestInterface;
+
+use UtilityAPI\Request\Request;
 
 use UtilityAPIConfig\UtilityAPIConfig;
 
@@ -23,19 +25,39 @@ class UtilityAPI {
   }
 
   public function listAccounts() {
-    $request = new UtilityAPIRequest(UtilityAPIConfig::$utility_api_service, UtilityAPIConfig::$utility_api_end_points['accounts']);
-
-
-    //$credentials = UtilityAPIConfig::$utility_api_credentials;
-    //$end_point_configuration = UtilityAPIConfig::$utility_api_end_points['accounts'];
-    //$this->callEndPoint($end_point_configuration, $credentials);
-    //return $this->performRequest();
+    return $this->handleRequest(UtilityAPIConfig::$utility_api_end_points['accounts']);
   }
 
-  public function handleRequest(UtilityAPIRequestInterface $request) {
-    $end_point_configuration = $request->getEndPointConfiguration();
+  public function handleRequest(array $end_point_configuration) {
+    $request = new Request($end_point_configuration, UtilityAPIConfig::$utility_api_service, UtilityAPIConfig::$utility_api_credentials);
     // Based on the configuration, we instantiate the chain of responsability.
+    $chain_head = $this->getChain($end_point_configuration['call_chain']);
+    $chain_head->handleNextRequest($request);
+    return $request;
+  }
 
-    //$end_point_controller = new $end_point_configuration['controller']();
+  /**
+   * @todo: rename this method.
+   */
+  public function getChain($call_chain) {
+    $chain_head = null;
+    $current = null;
+    $previous = null;
+    foreach ($call_chain as $key => $configuration) {
+      if (!empty($configuration['handler'])) {
+        $current = new $configuration['handler']();
+        if ($current instanceof RequestHandlerInterface) {
+          if (empty($chain_head)) {
+            $chain_head = $current;
+            $previous = $current;
+            continue;
+          }
+          if (!empty($previous)) {
+            $previous->setSuccessor($current);
+          }
+        }
+      }
+    }
+    return $chain_head;
   }
 }

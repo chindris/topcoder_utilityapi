@@ -33,11 +33,10 @@ class UtilityAPIConfig {
   public static $utility_api_end_points = array(
     // Returns a list of Account objects that you have permission to see.
     'accounts' => array(
-      'request_type' => 'get',
-      'target' => 'accounts',
       'call_chain' => array(
         'url_handler' => array(
           'target' => 'accounts',
+          'handler' => 'UtilityAPI\RequestHandler\RequestHandlerURL',
         ),
         'request_handler' => array(
           'request_type' => 'get',

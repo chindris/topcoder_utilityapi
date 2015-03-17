@@ -7,9 +7,15 @@ namespace UtilityAPI\Request;
  *  @todo: add comments.
  */
 
-interface UtilityAPIRequestInterface {
+interface RequestInterface {
 
   public function getUtilityApiService();
 
   public function getEndPointConfiguration();
+
+   public function getUtilityApiCredentials();
+
+   public function setEndPointURL($end_point_url);
+
+   public function getEndPointURL();
 }

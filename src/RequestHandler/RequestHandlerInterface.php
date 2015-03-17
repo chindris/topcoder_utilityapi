@@ -2,7 +2,7 @@
 
 namespace UtilityAPI\RequestHandler;
 
-use UtilityAPI\Request\UtilityAPIRequestInterface;
+use UtilityAPI\Request\RequestInterface;
 
 /**
  * @file
@@ -11,5 +11,9 @@ use UtilityAPI\Request\UtilityAPIRequestInterface;
 
 interface RequestHandlerInterface {
 
-  public function handleRequest(UtilityAPIRequestInterface $request);
+  public function handleRequest(RequestInterface $request);
+
+  public function handleNextRequest(RequestInterface $request);
+
+  public function setSuccessor(RequestHandlerInterface $successor);
 }
